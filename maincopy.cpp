@@ -7,7 +7,7 @@
 #include <thread>
 #include <unistd.h>
 using namespace std;
-#define N 5
+#define N 24
 #define INF INT_MAX
 struct Node
 {
@@ -140,6 +140,25 @@ int main()
 			{3, 5, INF, 2, 4},
 			{19, 6, 18, INF, 3},
 			{16, 4, 7, 16, INF}};
-	cout << "\n\nTotal Cost is " << solve(costMatrix);
+	int bigmofo[N][N];
+	for (int i = 0; i < N; i++)
+	{
+		for (size_t j = 0; j < N; j++)
+		{
+			if (i == j)
+			{
+				bigmofo[i][j] = INF;
+			}
+			else
+			{
+				bigmofo[i][j] = rand() % 100;
+			}
+		}
+	}
+	time_t pre, after;
+	time(&pre);
+	cout << "\n\nTotal Cost is " << solve(bigmofo);
+	time(&after);
+	cout << "\n\nTotal Time is " << after - pre;
 	return 0;
 }

@@ -7,7 +7,7 @@
 using namespace std;
 
 // N is number of total nodes on the graph or the cities in the map
-#define N 5
+#define N 24
 
 // Sentinal value for representing infinity
 #define INF INT_MAX
@@ -34,10 +34,10 @@ struct Node
 
 // Function to allocate a new node (i, j) corresponds to visiting
 // city j from city i
-Node* newNode(int parentMatrix[N][N], vector<pair<int, int>> const &path,
-			int level, int i, int j)
+Node *newNode(int parentMatrix[N][N], vector<pair<int, int>> const &path,
+			  int level, int i, int j)
 {
-	Node* node = new Node;
+	Node *node = new Node;
 
 	// stores ancestors edges of state space tree
 	node->path = path;
@@ -48,7 +48,7 @@ Node* newNode(int parentMatrix[N][N], vector<pair<int, int>> const &path,
 
 	// copy data from parent node to current node
 	memcpy(node->reducedMatrix, parentMatrix,
-		sizeof node->reducedMatrix);
+		   sizeof node->reducedMatrix);
 
 	// Change all entries of row i and column j to infinity
 	// skip for root node
@@ -148,8 +148,9 @@ void printPath(vector<pair<int, int>> const &list)
 }
 
 // Comparison object to be used to order the heap
-struct comp {
-	bool operator()(const Node* lhs, const Node* rhs) const
+struct comp
+{
+	bool operator()(const Node *lhs, const Node *rhs) const
 	{
 		return lhs->cost > rhs->cost;
 	}
@@ -159,13 +160,13 @@ struct comp {
 int solve(int costMatrix[N][N])
 {
 	// Create a priority queue to store live nodes of search tree;
-	priority_queue<Node*, std::vector<Node*>, comp> pq;
+	priority_queue<Node *, std::vector<Node *>, comp> pq;
 
 	vector<pair<int, int>> v;
 
 	// create a root node and calculate its cost
 	// The TSP starts from first city i.e. node 0
-	Node* root = newNode(costMatrix, v, 0, -1, 0);
+	Node *root = newNode(costMatrix, v, 0, -1, 0);
 
 	// get the lower bound of the path starting at node 0
 	root->cost = calculateCost(root->reducedMatrix);
@@ -178,7 +179,7 @@ int solve(int costMatrix[N][N])
 	while (!pq.empty())
 	{
 		// Find a live node with least estimated cost
-		Node* min = pq.top();
+		Node *min = pq.top();
 
 		// The found node is deleted from the list of live nodes
 		pq.pop();
@@ -206,8 +207,8 @@ int solve(int costMatrix[N][N])
 			if (min->reducedMatrix[i][j] != INF)
 			{
 				// create a child node and calculate its cost
-				Node* child = newNode(min->reducedMatrix, min->path,
-					min->level + 1, i, j);
+				Node *child = newNode(min->reducedMatrix, min->path,
+									  min->level + 1, i, j);
 
 				/* Cost of the child =
 					cost of parent node +
@@ -217,8 +218,7 @@ int solve(int costMatrix[N][N])
 
 				// We counld create a thread here that calculates cost
 
-				child->cost = min->cost + min->reducedMatrix[i][j]
-							+ calculateCost(child->reducedMatrix);
+				child->cost = min->cost + min->reducedMatrix[i][j] + calculateCost(child->reducedMatrix);
 
 				// Add child to list of live nodes
 				pq.push(child);
@@ -226,7 +226,6 @@ int solve(int costMatrix[N][N])
 		}
 
 		// We could join here
-		
 
 		// free node as we have already stored edges (i, j) in vector.
 		// So no need for parent node while printing solution.
@@ -251,13 +250,12 @@ int main()
 	*/
 	// cost 34
 	int costMatrix[N][N] =
-	{
-		{ INF, 20, 30,	10,	11 },
-		{ 15, INF, 16, 4,	2 },
-		{ 3,	5, INF, 2,	4 },
-		{ 19,	6,	18,	INF, 3 },
-		{ 16,	4,	7,	16,	INF }
-	};
+		{
+			{INF, 20, 30, 10, 11},
+			{15, INF, 16, 4, 2},
+			{3, 5, INF, 2, 4},
+			{19, 6, 18, INF, 3},
+			{16, 4, 7, 16, INF}};
 
 	/*
 	// cost 16
@@ -292,8 +290,27 @@ int main()
 		{6,	4,	3,	INF}
 	};
 	*/
+	int bigmofo[N][N];
+	for (int i = 0; i < N; i++)
+	{
+		for (size_t j = 0; j < N; j++)
+		{
+			if (i == j)
+			{
+				bigmofo[i][j] = INF;
+			}
+			else
+			{
+				bigmofo[i][j] = rand() % 100;
+			}
+		}
+	}
 
-	cout << "\n\nTotal Cost is " << solve(costMatrix);
+	time_t pre, after;
+	time(&pre);
+	cout << "\n\nTotal Cost is " << solve(bigmofo);
+	time(&after);
+	cout << "\n\nTotal Time is " << after - pre;
 
 	return 0;
 }
