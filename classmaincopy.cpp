@@ -10,37 +10,34 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
-// boost::mutex mtx;
 using namespace std;
-#define N 10
+#define N 2
 #define INF INT_MAX
-struct Node
+class Node
 {
+public:
 	vector<pair<int, int>> path;
 	int reducedMatrix[N][N];
 	int cost;
 	int vertex;
 	int level;
-};
-Node *newNode(int parentMatrix[N][N], vector<pair<int, int>> const &path,
-			  int level, int i, int j)
-{
-	Node *node = new Node;
-	node->path = path;
-	if (level != 0)
-		node->path.push_back(make_pair(i, j));
-	memcpy(node->reducedMatrix, parentMatrix,
-		   sizeof node->reducedMatrix);
-	for (int k = 0; level != 0 && k < N; k++)
+	Node(int parentMatrix[N][N], vector<pair<int, int>> const &path, int level, int i, int j)
 	{
-		node->reducedMatrix[i][k] = INF;
-		node->reducedMatrix[k][j] = INF;
+		this->path = path;
+		if (level != 0)
+			this->path.push_back(make_pair(i, j));
+		memcpy(this->reducedMatrix, parentMatrix,
+			   sizeof this->reducedMatrix);
+		for (int k = 0; level != 0 && k < N; k++)
+		{
+			this->reducedMatrix[i][k] = INF;
+			this->reducedMatrix[k][j] = INF;
+		}
+		this->reducedMatrix[j][0] = INF;
+		this->level = level;
+		this->vertex = j;
 	}
-	node->reducedMatrix[j][0] = INF;
-	node->level = level;
-	node->vertex = j;
-	return node;
-}
+};
 int rowReduction(int reducedMatrix[N][N], int row[N])
 {
 	fill_n(row, N, INF);
@@ -85,60 +82,48 @@ void printPath(vector<pair<int, int>> const &list)
 }
 struct comp
 {
-	bool operator()(const Node *lhs, const Node *rhs) const
+	bool operator()(const Node lhs, const Node rhs) const
 	{
-		return lhs->cost > rhs->cost;
+		return lhs.cost > rhs.cost;
 	}
 };
 
-void foo(Node *min, priority_queue<Node *, std::vector<Node *>, comp> &pq, int i, int j)
+void foo(Node min, priority_queue<Node, std::vector<Node>, comp> &pq, int i, int j)
 {
-	try
-	{
-		Node *child = newNode(min->reducedMatrix, min->path, min->level + 1, i, j);
-		child->cost = min->cost + min->reducedMatrix[i][j] + calculateCost(child->reducedMatrix);
-		// mutex lock used to be here
-		pq.push(child);
-		// mutex unlock used to be here
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
+	Node child =  Node(min.reducedMatrix, min.path, min.level + 1, i, j);
+	child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);
+	pq.push(child);
+	
 }
-
-
 int solve(int costMatrix[N][N])
 {
-	boost::asio::thread_pool pool(1);
-	priority_queue<Node *, std::vector<Node *>, comp> pq;
+	boost::asio::thread_pool pool(4);
+	priority_queue<Node, std::vector<Node>, comp> pq;
 	vector<pair<int, int>> v;
-	Node *root = newNode(costMatrix, v, 0, -1, 0);
-	root->cost = calculateCost(root->reducedMatrix);
+	Node root = Node(costMatrix, v, 0, -1, 0);
+	root.cost = calculateCost(root.reducedMatrix);
 	pq.push(root);
 	while (!pq.empty())
 	{
-		Node *min = pq.top();
+		Node min = pq.top();
 		pq.pop();
-		int i = min->vertex;
-		if (min->level == N - 1)
+		int i = min.vertex;
+		if (min.level == N - 1)
 		{
-			min->path.push_back(make_pair(i, 0));
-			printPath(min->path);
-			return min->cost;
+			min.path.push_back(make_pair(i, 0));
+			printPath(min.path);
+			return min.cost;
 		}
 		for (int j = 0; j < N; j++)
 		{
-			if (min->reducedMatrix[i][j] != INF)
-			{		
+			if (min.reducedMatrix[i][j] != INF)
+			{
 				boost::asio::post(pool, boost::bind(foo, min, std::ref(pq), i, j));
 			}
 		}
-		delete min;
 		pool.join();
 	}
 }
-
 int main()
 {
 	// int costMatrix[N][N] =
