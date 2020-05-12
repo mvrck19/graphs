@@ -1,6 +1,9 @@
+all: tsp tsp_threaded
+
+
 tsp:
-	gcc tsp.cpp -o tsp
+	g++ tsp.cpp -o tsp
 
 tsp_threaded:
-	gcc tsp_threaded.cpp -o tsp_threaded
+	g++ tsp_threaded.cpp -o tsp_threaded -pthread
 
