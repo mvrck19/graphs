@@ -145,10 +145,10 @@ int main()
 			}
 		}
 	}
-	time_t pre, after;
-	time(&pre);
+	auto start = std::chrono::steady_clock::now();
 	cout << "\n\nTotal Cost is " << solve(random);
-	time(&after);
-	cout << "\n\nTotal Time is " << after - pre;
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	cout << "\n\nTotal Time is " << elapsed_seconds.count() << "s\n";
 	return 0;
 }

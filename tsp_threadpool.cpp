@@ -134,7 +134,7 @@ int main()
 	// 		{3, 5, INF, 2, 4},
 	// 		{19, 6, 18, INF, 3},
 	// 		{16, 4, 7, 16, INF}};
-	
+
 	// Randomly generated array
 	int random[N][N];
 	for (int i = 0; i < N; i++)
@@ -151,10 +151,10 @@ int main()
 			}
 		}
 	}
-	time_t pre, after;
-	time(&pre);
+	auto start = std::chrono::steady_clock::now();
 	cout << "\n\nTotal Cost is " << solve(random);
-	time(&after);
-	cout << "\n\nTotal Time is " << after - pre;
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	cout << "\n\nTotal Time is " << elapsed_seconds.count() << "s\n";
 	return 0;
 }
