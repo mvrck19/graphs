@@ -4,76 +4,44 @@
 #include <utility>
 #include <cstring>
 #include <climits>
+#include <chrono>
 using namespace std;
 
 // N is number of total nodes on the graph or the cities in the map
-#define N 24
+#define N 10
 
 // Sentinal value for representing infinity
 #define INF INT_MAX
 
-// State Space Tree nodes
-struct Node
+class Node
 {
-	// stores edges of state space tree
-	// helps in tracing path when answer is found
-	vector<pair<int, int>> path;
-
-	// stores the reduced matrix
-	int reducedMatrix[N][N];
-
-	// stores the lower bound
-	int cost;
-
-	//stores current city number
-	int vertex;
-
-	// stores number of cities visited so far
-	int level;
+public:
+    vector<pair<int, int>> path;
+    int reducedMatrix[N][N];
+    int cost;
+    int vertex;
+    int level;
+    Node(int parentMatrix[N][N], vector<pair<int, int>> const &path,int level, int i, int j)
+    {
+        this->path = path;
+        if (level != 0)
+            this->path.push_back(make_pair(i, j));
+        memcpy(this->reducedMatrix, parentMatrix,
+               sizeof this->reducedMatrix);
+        for (int k = 0; level != 0 && k < N; k++)
+        {
+            this->reducedMatrix[i][k] = INF;
+            this->reducedMatrix[k][j] = INF;
+        }
+        this->reducedMatrix[j][0] = INF;
+        this->level = level;
+        this->vertex = j;
+        
+    }
 };
 
-// Function to allocate a new node (i, j) corresponds to visiting
-// city j from city i
-Node *newNode(int parentMatrix[N][N], vector<pair<int, int>> const &path,
-			  int level, int i, int j)
-{
-	Node *node = new Node;
 
-	// stores ancestors edges of state space tree
-	node->path = path;
-	// skip for root node
-	if (level != 0)
-		// add current edge to path
-		node->path.push_back(make_pair(i, j));
-
-	// copy data from parent node to current node
-	memcpy(node->reducedMatrix, parentMatrix,
-		   sizeof node->reducedMatrix);
-
-	// Change all entries of row i and column j to infinity
-	// skip for root node
-	for (int k = 0; level != 0 && k < N; k++)
-	{
-		// set outgoing edges for city i to infinity
-		node->reducedMatrix[i][k] = INF;
-
-		// set incoming edges to city j to infinity
-		node->reducedMatrix[k][j] = INF;
-	}
-
-	// Set (j, 0) to infinity
-	// here start node is 0
-	node->reducedMatrix[j][0] = INF;
-
-	// set number of cities visited so far
-	node->level = level;
-
-	// assign current city number
-	node->vertex = j;
-
-	// return node
-	return node;
-}
+// State Space Tree nodes
 
 // Function to reduce each row in such a way that
 // there must be at least one zero in each row
@@ -150,9 +118,9 @@ void printPath(vector<pair<int, int>> const &list)
 // Comparison object to be used to order the heap
 struct comp
 {
-	bool operator()(const Node *lhs, const Node *rhs) const
+	bool operator()(const Node lhs, const Node rhs) const
 	{
-		return lhs->cost > rhs->cost;
+		return lhs.cost > rhs.cost;
 	}
 };
 
@@ -160,16 +128,16 @@ struct comp
 int solve(int costMatrix[N][N])
 {
 	// Create a priority queue to store live nodes of search tree;
-	priority_queue<Node *, std::vector<Node *>, comp> pq;
+	priority_queue<Node , std::vector<Node >, comp> pq;
 
 	vector<pair<int, int>> v;
 
 	// create a root node and calculate its cost
 	// The TSP starts from first city i.e. node 0
-	Node *root = newNode(costMatrix, v, 0, -1, 0);
+	Node root = Node(costMatrix, v, 0, -1, 0);
 
 	// get the lower bound of the path starting at node 0
-	root->cost = calculateCost(root->reducedMatrix);
+	root.cost = calculateCost(root.reducedMatrix);
 
 	// Add root to list of live nodes;
 	pq.push(root);
@@ -179,64 +147,54 @@ int solve(int costMatrix[N][N])
 	while (!pq.empty())
 	{
 		// Find a live node with least estimated cost
-		Node *min = pq.top();
+		Node min = pq.top();
 
 		// The found node is deleted from the list of live nodes
 		pq.pop();
 
 		// i stores current city number
-		int i = min->vertex;
+		int i = min.vertex;
 
 		// if all cities are visited
-		if (min->level == N - 1)
+		if (min.level == N - 1)
 		{
 			// return to starting city
-			min->path.push_back(make_pair(i, 0));
+			min.path.push_back(make_pair(i, 0));
 
 			// print list of cities visited;
-			printPath(min->path);
+			printPath(min.path);
 
 			// return optimal cost
-			return min->cost;
+			return min.cost;
 		}
 
 		// do for each child of min
 		// (i, j) forms an edge in space tree
 		for (int j = 0; j < N; j++)
 		{
-			if (min->reducedMatrix[i][j] != INF)
+			if (min.reducedMatrix[i][j] != INF)
 			{
 				// create a child node and calculate its cost
-				Node *child = newNode(min->reducedMatrix, min->path,
-									  min->level + 1, i, j);
+				Node child = Node(min.reducedMatrix, min.path,
+									  min.level + 1, i, j);
 
 				/* Cost of the child =
 					cost of parent node +
 					cost of the edge(i, j) +
 					lower bound of the path starting at node j
 				*/
-
-				// We counld create a thread here that calculates cost
-
-				child->cost = min->cost + min->reducedMatrix[i][j] + calculateCost(child->reducedMatrix);
+				child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);
 
 				// Add child to list of live nodes
 				pq.push(child);
 			}
 		}
-
-		// We could join here
-
-		// free node as we have already stored edges (i, j) in vector.
-		// So no need for parent node while printing solution.
-		delete min;
 	}
 }
 
 // main function
 int main()
 {
-	// cost matrix for traveling salesman problem.
 	/*
 	int costMatrix[N][N] =
 	{
@@ -249,6 +207,7 @@ int main()
 	};
 	*/
 	// cost 34
+	// Example matrix
 	int costMatrix[N][N] =
 		{
 			{INF, 20, 30, 10, 11},
@@ -290,27 +249,27 @@ int main()
 		{6,	4,	3,	INF}
 	};
 	*/
-	int bigmofo[N][N];
+	int random[N][N];
 	for (int i = 0; i < N; i++)
 	{
 		for (size_t j = 0; j < N; j++)
 		{
 			if (i == j)
 			{
-				bigmofo[i][j] = INF;
+				random[i][j] = INF;
 			}
 			else
 			{
-				bigmofo[i][j] = rand() % 100;
+				random[i][j] = rand() % 100;
 			}
 		}
 	}
 
-	time_t pre, after;
-	time(&pre);
-	cout << "\n\nTotal Cost is " << solve(bigmofo);
-	time(&after);
-	cout << "\n\nTotal Time is " << after - pre;
+	auto start = std::chrono::steady_clock::now();
+	cout << "\n\nTotal Cost is " << solve(random);
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	cout << "\n\nTotal Time is " << elapsed_seconds.count() << "s\n";
 
 	return 0;
 }
