@@ -9,10 +9,8 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.out",
-                "-std=c++11",
                 "-pthread",
-                "-lboost_thread",
-                "-I/home/mvrck/Documents/Github/vcpkg/installed/x64-linux/include",
+                "-I${fileDirname}/lib/boost_1_73_0/",
             ],
             "options": {
                 "cwd": "/usr/bin"

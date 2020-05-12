@@ -4,12 +4,9 @@
 #include <utility>
 #include <cstring>
 #include <climits>
-#include <thread>
 #include <unistd.h>
-#include <boost/asio/thread_pool.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 using namespace std;
 #define N 3
 #define INF INT_MAX
@@ -38,7 +35,7 @@ public:
 		this->vertex = j;
 	}
 };
-int rowReduction(int reducedMatrix[N][N], int row[N])
+void rowReduction(int reducedMatrix[N][N], int row[N])
 {
 	fill_n(row, N, INF);
 	for (int i = 0; i < N; i++)
@@ -50,7 +47,7 @@ int rowReduction(int reducedMatrix[N][N], int row[N])
 			if (reducedMatrix[i][j] != INF && row[i] != INF)
 				reducedMatrix[i][j] -= row[i];
 }
-int columnReduction(int reducedMatrix[N][N], int col[N])
+void columnReduction(int reducedMatrix[N][N], int col[N])
 {
 	fill_n(col, N, INF);
 	for (int i = 0; i < N; i++)
