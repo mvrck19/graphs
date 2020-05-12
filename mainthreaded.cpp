@@ -100,6 +100,7 @@ void foo(Node *min, priority_queue<Node *, std::vector<Node *>, comp> &pq, int i
 		// mutex lock used to be here
 		pq.push(child);
 		// mutex unlock used to be here
+		
 	}
 	catch(const std::exception& e)
 	{

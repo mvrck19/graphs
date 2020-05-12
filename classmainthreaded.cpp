@@ -90,9 +90,12 @@ struct comp
 
 void foo(Node min, priority_queue<Node, std::vector<Node>, comp> &pq, int i, int j)
 {
+	
 	Node child =  Node(min.reducedMatrix, min.path, min.level + 1, i, j);
 	child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);
 	pq.push(child);
+	
+	printf("");
 	
 }
 int solve(int costMatrix[N][N])
