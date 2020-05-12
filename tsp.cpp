@@ -182,28 +182,18 @@ int solve(int costMatrix[N][N])
 					cost of the edge(i, j) +
 					lower bound of the path starting at node j
 				*/
-
-				// We counld create a thread here that calculates cost
-
 				child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);
 
 				// Add child to list of live nodes
 				pq.push(child);
 			}
 		}
-
-		// We could join here
-
-		// free node as we have already stored edges (i, j) in vector.
-		// So no need for parent node while printing solution.
-		// delete min;
 	}
 }
 
 // main function
 int main()
 {
-	// cost matrix for traveling salesman problem.
 	/*
 	int costMatrix[N][N] =
 	{
@@ -216,6 +206,7 @@ int main()
 	};
 	*/
 	// cost 34
+	// Example matrix
 	int costMatrix[N][N] =
 		{
 			{INF, 20, 30, 10, 11},
@@ -257,25 +248,25 @@ int main()
 		{6,	4,	3,	INF}
 	};
 	*/
-	int bigmofo[N][N];
+	int random[N][N];
 	for (int i = 0; i < N; i++)
 	{
 		for (size_t j = 0; j < N; j++)
 		{
 			if (i == j)
 			{
-				bigmofo[i][j] = INF;
+				random[i][j] = INF;
 			}
 			else
 			{
-				bigmofo[i][j] = rand() % 100;
+				random[i][j] = rand() % 100;
 			}
 		}
 	}
 
 	time_t pre, after;
 	time(&pre);
-	cout << "\n\nTotal Cost is " << solve(bigmofo);
+	cout << "\n\nTotal Cost is " << solve(random);
 	time(&after);
 	cout << "\n\nTotal Time is " << after - pre;
 

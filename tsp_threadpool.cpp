@@ -37,23 +37,6 @@ public:
 		this->level = level;
 		this->vertex = j;
 	}
-
-	string printarray(int array[N][N])
-	{
-		printf("Reduced array: \n");
-		for (int i = 0; i < N; i++)
-			for (size_t j = 0; j < N; j++)
-				cout << " " << array[i][j] << " ";
-	}
-
-	string to_string()
-	{
-		
-		printf("Cost: %d\n", cost);
-		printf("Vertex: %d\n", vertex);
-		printf("Level: %d\n", level);
-		printarray(reducedMatrix);
-	}
 };
 int rowReduction(int reducedMatrix[N][N], int row[N])
 {
@@ -107,15 +90,11 @@ struct comp
 
 void foo(Node min, priority_queue<Node, std::vector<Node>, comp> &pq, int i, int j)
 {
-
 	Node child = Node(min.reducedMatrix, min.path, min.level + 1, i, j);
-	child.to_string();
-	child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);child.to_string();
+	child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);
 	pq.push(child);
-
-	printf("i : %d | j : %d\n",i,j);
-	child.to_string();
 }
+
 int solve(int costMatrix[N][N])
 {
 	boost::asio::thread_pool pool(1);
@@ -147,6 +126,7 @@ int solve(int costMatrix[N][N])
 }
 int main()
 {
+	// Example matrix
 	// int costMatrix[N][N] =
 	// 	{
 	// 		{INF, 20, 30, 10, 11},
@@ -154,24 +134,26 @@ int main()
 	// 		{3, 5, INF, 2, 4},
 	// 		{19, 6, 18, INF, 3},
 	// 		{16, 4, 7, 16, INF}};
-	int bigmofo[N][N];
+	
+	// Randomly generated array
+	int random[N][N];
 	for (int i = 0; i < N; i++)
 	{
 		for (size_t j = 0; j < N; j++)
 		{
 			if (i == j)
 			{
-				bigmofo[i][j] = INF;
+				random[i][j] = INF;
 			}
 			else
 			{
-				bigmofo[i][j] = rand() % 100;
+				random[i][j] = rand() % 100;
 			}
 		}
 	}
 	time_t pre, after;
 	time(&pre);
-	cout << "\n\nTotal Cost is " << solve(bigmofo);
+	cout << "\n\nTotal Cost is " << solve(random);
 	time(&after);
 	cout << "\n\nTotal Time is " << after - pre;
 	return 0;
