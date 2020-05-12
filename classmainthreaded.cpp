@@ -11,7 +11,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 using namespace std;
-#define N 2
+#define N 3
 #define INF INT_MAX
 class Node
 {
@@ -36,6 +36,23 @@ public:
 		this->reducedMatrix[j][0] = INF;
 		this->level = level;
 		this->vertex = j;
+	}
+
+	string printarray(int array[N][N])
+	{
+		printf("Reduced array: \n");
+		for (int i = 0; i < N; i++)
+			for (size_t j = 0; j < N; j++)
+				cout << " " << array[i][j] << " ";
+	}
+
+	string to_string()
+	{
+		
+		printf("Cost: %d\n", cost);
+		printf("Vertex: %d\n", vertex);
+		printf("Level: %d\n", level);
+		printarray(reducedMatrix);
 	}
 };
 int rowReduction(int reducedMatrix[N][N], int row[N])
@@ -90,17 +107,18 @@ struct comp
 
 void foo(Node min, priority_queue<Node, std::vector<Node>, comp> &pq, int i, int j)
 {
-	
-	Node child =  Node(min.reducedMatrix, min.path, min.level + 1, i, j);
-	child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);
+
+	Node child = Node(min.reducedMatrix, min.path, min.level + 1, i, j);
+	child.to_string();
+	child.cost = min.cost + min.reducedMatrix[i][j] + calculateCost(child.reducedMatrix);child.to_string();
 	pq.push(child);
-	
-	printf("");
-	
+
+	printf("i : %d | j : %d\n",i,j);
+	child.to_string();
 }
 int solve(int costMatrix[N][N])
 {
-	boost::asio::thread_pool pool(4);
+	boost::asio::thread_pool pool(1);
 	priority_queue<Node, std::vector<Node>, comp> pq;
 	vector<pair<int, int>> v;
 	Node root = Node(costMatrix, v, 0, -1, 0);

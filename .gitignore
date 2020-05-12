@@ -40,3 +40,6 @@
 !.vscode/extensions.json
 
 # End of https://www.gitignore.io/api/code
+
+### Custom ###
+testground.cpp
