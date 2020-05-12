@@ -4,12 +4,9 @@
 #include <utility>
 #include <cstring>
 #include <climits>
-#include <thread>
 #include <unistd.h>
-#include <boost/asio/thread_pool.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 using namespace std;
 #define N 3
 #define INF INT_MAX
