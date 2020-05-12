@@ -45,7 +45,7 @@ public:
 
 // Function to reduce each row in such a way that
 // there must be at least one zero in each row
-int rowReduction(int reducedMatrix[N][N], int row[N])
+void rowReduction(int reducedMatrix[N][N], int row[N])
 {
 	// initialize row array to INF
 	fill_n(row, N, INF);
@@ -65,7 +65,7 @@ int rowReduction(int reducedMatrix[N][N], int row[N])
 
 // Function to reduce each column in such a way that
 // there must be at least one zero in each column
-int columnReduction(int reducedMatrix[N][N], int col[N])
+void columnReduction(int reducedMatrix[N][N], int col[N])
 {
 	// initialize col array to INF
 	fill_n(col, N, INF);
